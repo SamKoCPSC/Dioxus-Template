@@ -11,6 +11,11 @@ class ConfigureTests(unittest.TestCase):
    import tomllib
    self.assertEqual(tomllib.loads((root/"Dioxus.toml").read_text())["web"]["app"]["title"],'My "New" App')
    self.assertEqual((root/".env.local").read_text(),"PRIVATE_CONFIGURATION=untouched\n")
+ def test_invalid_manifest_does_not_partially_replace_identity(self):
+  with tempfile.TemporaryDirectory() as directory:
+   root=Path(directory);(root/"Dioxus.toml").write_text('[web.app]\n');(root/"app.json").write_text('{"name":"Original"}')
+   with self.assertRaises(ValueError):module.configure(root,"New App","new-app")
+   self.assertEqual((root/"app.json").read_text(),'{"name":"Original"}')
  def test_invalid_names_and_path_like_slugs_cannot_write_files(self):
   for name,slug in [("", "my-app"),("bad\nname","my-app"),("App","../other"),("App","UPPER"),("App","a"),("App","app-")]:
    with self.subTest(name=name,slug=slug),tempfile.TemporaryDirectory() as directory:

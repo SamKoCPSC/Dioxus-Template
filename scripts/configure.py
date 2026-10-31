@@ -8,10 +8,11 @@ def configure(root,name,slug):
         raise ValueError("Name must be 1–80 printable characters")
     if not re.fullmatch(r"[a-z0-9](?:[a-z0-9-]{1,46})[a-z0-9]",slug):
         raise ValueError("Slug must be 3–48 lowercase letters, digits, or internal hyphens")
-    (root/"app.json").write_text(json.dumps({"name":name.strip(),"slug":slug},ensure_ascii=False,indent=2)+"\n")
     path=root/"Dioxus.toml"
     text=path.read_text()
-    text=re.sub(r"(?m)^title = .*", "title = "+json.dumps(name.strip(),ensure_ascii=False), text)
+    text,count=re.subn(r"(?m)^title = .*", "title = "+json.dumps(name.strip(),ensure_ascii=False), text)
+    if count!=1:raise ValueError("Dioxus.toml must contain exactly one app title")
+    (root/"app.json").write_text(json.dumps({"name":name.strip(),"slug":slug},ensure_ascii=False,indent=2)+"\n")
     path.write_text(text)
 def main():
     parser=argparse.ArgumentParser(description=__doc__)

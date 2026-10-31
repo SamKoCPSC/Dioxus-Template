@@ -6,7 +6,7 @@ process environments. Mark pending work explicitly rather than checking it off.
 
 - Repository / branch / commit:
 - Template version / origin commit:
-- App display name / slug:
+- App display name / slug / license:
 - Public origin and hosting choice:
 - Enabled modules (Notes example, optional storage, product-specific additions):
 - Local instance name / canonical loopback origin:

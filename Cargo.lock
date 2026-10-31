@@ -1944,18 +1944,18 @@ dependencies = [
 
 [[package]]
 name = "enumset"
-version = "1.1.12"
+version = "1.1.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7f96a4a12fe60ac746ae295a1a4ecb5bb02debc20856506c8635288065f142de"
+checksum = "2e6bd2d7c76d078cd7a460fa169f778c42c026fe16d90e37d7a45d37181bdce5"
 dependencies = [
  "enumset_derive",
 ]
 
 [[package]]
 name = "enumset_derive"
-version = "0.15.0"
+version = "0.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4bd536557b58c682b217b8fb199afdff47cd3eff260623f19e77074eb073d63a"
+checksum = "f60587c2044cabd91c4d4c73e3912e9f1ea7d76905f31c7eec51869305dae044"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -1976,7 +1976,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -2030,7 +2030,7 @@ checksum = "da0e4dd2a88388a1f4ccc7c9ce104604dab68d9f408dc34cd45823d5a9069095"
 dependencies = [
  "futures-core",
  "futures-sink",
- "spin 0.9.8",
+ "spin 0.9.9",
 ]
 
 [[package]]
@@ -2894,7 +2894,7 @@ version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
 dependencies = [
- "spin 0.9.8",
+ "spin 0.9.9",
 ]
 
 [[package]]
@@ -3155,7 +3155,7 @@ dependencies = [
  "httparse",
  "memchr",
  "mime",
- "spin 0.9.8",
+ "spin 0.9.9",
  "version_check",
 ]
 
@@ -3212,7 +3212,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -3946,7 +3946,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -4323,14 +4323,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3a766e1110788c36f4fa1c2b71b387a7815aa65f88ce0229841826633d93723e"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
 name = "spin"
-version = "0.9.8"
+version = "0.9.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6980e8d7511241f8acf4aebddbb1ff938df5eebe98691418c4468d0b72a96a67"
+checksum = "3763264f6b73151db08c50ff20d7d8a0b8796e021cdea7ceedad07b80155fa0e"
 dependencies = [
  "lock_api",
 ]
@@ -4662,7 +4662,7 @@ dependencies = [
  "getrandom 0.4.2",
  "once_cell",
  "rustix",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -4772,9 +4772,9 @@ checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
 
 [[package]]
 name = "tokio"
-version = "1.52.3"
+version = "1.54.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8fc7f01b389ac15039e4dc9531aa973a135d7a4135281b12d7c1bc79fd57fffe"
+checksum = "b52fd3255258d26fac7264ab5a76b53c13367136dc011d3d6ad4f8ed070396a3"
 dependencies = [
  "bytes",
  "libc",
@@ -5457,7 +5457,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.48.0",
 ]
 
 [[package]]

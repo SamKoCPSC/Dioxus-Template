@@ -32,7 +32,7 @@ done
 
 # Project credentials such as OAuth client secrets and session signing keys do
 # not have reliable global prefixes. Inspect assignment-shaped lines and allow
-# only the exact development placeholders documented in .env.local.example or
+# only the exact documented local/production example placeholders or
 # environment/reference substitutions. Report filenames, never values.
 assignment_pattern='^[[:space:]]*(-[[:space:]]*)?(export[[:space:]]+)?"?(SESSION_SECRET|APP_STAGING_LOGIN_SECRET|GOOGLE_CLIENT_SECRET|GITHUB_CLIENT_SECRET|S3_ACCESS_KEY_ID|S3_SECRET_ACCESS_KEY)"?[[:space:]]*[:=]'
 mapfile -t assignment_files < <(

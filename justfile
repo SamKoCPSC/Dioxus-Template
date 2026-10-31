@@ -40,3 +40,6 @@ host-status instance:
     python3 scripts/host-dev.py status {{quote(instance)}}
 host-browser instance:
     python3 scripts/browser-smoke.py --host --instance {{quote(instance)}}
+
+audit:
+    bash scripts/security-audit.sh

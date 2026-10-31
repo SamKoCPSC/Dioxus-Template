@@ -9,7 +9,7 @@ handoff. Do not stop at listing environment variables.
 Inspect the remote, current branch, worktree changes and available tooling. If
 this is still the template repository, help the user generate a new repository
 before changing product code. Preserve existing changes. Confirm the new app's
-name and lowercase slug, intended hostname, and hosting choice. Bundle these
+name and lowercase slug, intended hostname, hosting choice, and license. Bundle these
 non-secret questions; do not ask the user to paste any secrets into chat.
 
 Default to this web stack, private Notes example, Google/GitHub login, plain

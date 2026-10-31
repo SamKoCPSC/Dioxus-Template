@@ -27,3 +27,6 @@ Third-party packages retain their own licenses. No Noms application data, live
 credentials, browser state, database/media volumes or production service binding
 belongs in the template. The maintained application package name is `app` so a
 new product does not require renaming executable/bundle/import paths.
+
+See [extraction-validation.md](extraction-validation.md) for the initial test
+results and the boundary between local mock verification and hosted deployment.

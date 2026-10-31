@@ -1,0 +1,4 @@
+# RUSTSEC-ID|expires-on|narrow reachability rationale
+# Evidence and re-evaluation instructions: docs/dependency-audit.md
+RUSTSEC-2023-0071|2026-11-30|RSA is lockfile metadata for disabled SQLx MySQL. Both server feature graphs are checked to contain no RSA path before applying this exception.
+RUSTSEC-2026-0253|2026-11-30|Inherited LRU caches use String keys in Dioxus and CacheKey(String) without custom Drop in optional AWS S3. The advisory requires a panicking key destructor during pop. No app-defined panicking key is used.

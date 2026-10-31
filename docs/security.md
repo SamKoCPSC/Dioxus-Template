@@ -70,3 +70,7 @@ Keep the auth/session/proxy/isolation regressions, both compiler targets, Clippy
 dependency audit and tracked-secret checks in CI. Update the tests when a generic
 contract changes. New product roles, multi-tenancy, external content import,
 billing or storage workflows need their own threat/authorization model.
+
+The dependency audit uses narrowly justified, expiring exceptions with active
+graph checks. Read [dependency-audit.md](dependency-audit.md) before changing
+features, cache key types, or the audit policy.

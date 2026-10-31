@@ -6,7 +6,9 @@ fn main() {
     let name = value["name"].as_str().expect("app.name");
     let slug = value["slug"].as_str().expect("app.slug");
     assert!(
-        !name.trim().is_empty() && name.len() <= 80 && !name.chars().any(char::is_control),
+        !name.trim().is_empty()
+            && name.chars().count() <= 80
+            && !name.chars().any(char::is_control),
         "name must be 1-80 printable characters"
     );
     assert!(

@@ -1766,7 +1766,7 @@ mod tests {
             let (_db, pool) = test_utils::setup_test_db().await;
             let (_state_id, cookie) = start_test_login(pool).await;
 
-            assert!(cookie.name().starts_with("app_oauth_tx_"));
+            assert!(cookie.name().starts_with(BROWSER_BINDING_COOKIE_PREFIX));
             assert_eq!(cookie.path(), Some("/auth/google/callback"));
             assert_eq!(
                 cookie.domain(),
