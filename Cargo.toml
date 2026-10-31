@@ -1,0 +1,108 @@
+[package]
+name = "app"
+version = "0.1.0"
+edition = "2021"
+default-run = "app"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+dioxus = { version = "0.7.1", features = ["router", "fullstack"] }
+tracing = "0.1"
+
+# Server-only — never compiled into the WASM client
+sqlx             = { version = "0.8", default-features = false, features = ["runtime-tokio-rustls", "postgres", "chrono", "uuid", "json", "macros"], optional = true }
+tracing-subscriber = { version = "0.3", features = ["json"], optional = true }
+oauth2           = { version = "5", optional = true }
+jsonwebtoken     = { version = "9", optional = true }
+axum             = { version = "0.8", features = ["multipart"], optional = true }
+axum-extra       = { version = "0.10", features = ["cookie"], optional = true }
+reqwest          = { version = "0.12", features = ["json"], optional = true }
+uuid             = { version = "1", features = ["v4", "serde", "js"] }
+serde            = { version = "1", features = ["derive"] }
+percent-encoding = "2"
+url                = "2"
+serde_json       = "1"
+time             = { version = "0.3", optional = true }
+cookie           = { version = "0.18", optional = true }
+chrono           = { version = "0.4", features = ["serde"] }
+tokio            = { version = "1", features = ["rt-multi-thread", "macros"], optional = true }
+unicode-normalization = "0.1"
+dashmap = { version = "6", optional = true }
+ipnet = { version = "2", optional = true }
+sha2 = "0.10"
+subtle = { version = "2", optional = true }
+wasm-bindgen = "0.2"
+futures-channel = "0.3"
+
+# Browser-only dependencies for the shared interaction primitives.
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+dioxus-web = "0.7"
+web-sys = { version = "0.3.98", features = [
+    "Window", "Storage", "Location", "History", "Document", "Navigator", "Clipboard", "ShareData", "MouseEvent", "Element", "Node",
+    "HtmlCanvasElement", "CanvasRenderingContext2d", "HtmlImageElement", "HtmlInputElement", "HtmlTextAreaElement", "HtmlSelectElement", "ImageData",
+    "Blob", "BlobPropertyBag", "File", "FileReader", "Url", "HtmlAnchorElement", "Response", "RequestCredentials",
+    "DataTransfer", "DataTransferItem",
+    "DragEvent", "KeyboardEvent", "Event", "EventTarget", "HtmlElement", "HtmlDialogElement",
+    "CssStyleDeclaration", "DomRect", "DomRectList", "NodeList", "FocusOptions",
+    "MediaQueryList", "WebGlRenderingContext", "WebGlProgram", "WebGlShader", "WebGlBuffer", "WebGlUniformLocation", "WebGlTexture", "WebGlContextEvent", "ScrollToOptions",
+    "VisualViewport", "ResizeObserver", "ScrollIntoViewOptions", "ScrollLogicalPosition", "ScrollBehavior",
+    "Cache", "CacheStorage", "Response", "RequestCache", "AbortController", "AbortSignal"
+] }
+js-sys = "0.3"
+wasm-bindgen-futures = "0.4"
+gloo-net = { version = "0.6", features = ["http"] }
+gloo-timers = "0.3"
+
+[features]
+default = ["web"]
+web     = ["dioxus/web"]
+server  = [
+    "dioxus/server",
+    "sqlx",
+    "tracing-subscriber",
+    "oauth2",
+    "jsonwebtoken",
+    "axum",
+    "axum-extra",
+    "reqwest",
+    "time",
+    "cookie",
+    "tokio",
+    "dashmap",
+    "ipnet",
+    "dep:subtle",
+]
+
+storage-s3 = ["dep:aws-sdk-s3", "dep:aws-config"]
+
+[dev-dependencies]
+pgtemp = "0.7"
+wiremock = "0.6"
+tower = { version = "0.5", features = ["util"] }
+dioxus-ssr = "0.7"
+dioxus-core = "0.7"
+# Dispatch real serialized form events in component regressions (test-only).
+dioxus-html = { version = "0.7", features = ["serialize"] }
+
+[lints.rust]
+warnings = "deny"
+
+[lints.clippy]
+all = "warn"
+
+
+[build-dependencies]
+serde_json = "1"
+
+[profile.dev]
+debug = 0
+incremental = false
+
+[profile.test]
+debug = 0
+incremental = false
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+aws-sdk-s3       = { version = "1", default-features = false, features = ["http-1x", "default-https-client", "rt-tokio", "behavior-version-latest"], optional = true }
+aws-config       = { version = "1", default-features = false, features = ["default-https-client", "rt-tokio", "behavior-version-latest"], optional = true }
