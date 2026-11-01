@@ -40,11 +40,9 @@ Google/GitHub registration was changed or tested.
 Optional object storage was compiled, not tested against a live bucket; it remains
 a building block requiring product-specific attachment ownership and cleanup.
 
-CI workflows are provided but remote execution requires publishing the feature
-branch. GitHub rejected repository writes during extraction with HTTP 403
-“Resource not accessible by integration.” After access is corrected, publish the
-branches, open the review PR, run CI, and enable GitHub's template setting once
-main contains the reviewed template. No merge or hosted deployment was performed.
+CI workflows are provided for pull requests. Inspect their actual results before
+merging. Enable GitHub's template setting once main contains the reviewed
+template. No merge or hosted deployment was performed.
 
 A source license has not been selected. Resolve licensing before distributing
 code under a chosen license; do not silently add a license in a generated app.
