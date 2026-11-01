@@ -1,0 +1,9 @@
+[application]
+name = "app"
+[web.app]
+title = "Dioxus Template"
+[web.resource]
+style = []
+script = []
+[web.resource.dev]
+script = []

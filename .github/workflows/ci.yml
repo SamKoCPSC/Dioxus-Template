@@ -1,0 +1,87 @@
+name: CI
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [wasm, server, storage]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: dtolnay/rust-toolchain@a5f673d0ba8626c3977bb416a1612774bc82181b
+        with:
+          toolchain: stable
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@49a0bdc70d2e1b713ca9e2869b211fcce03d3c1c
+        with:
+          key: check-${{ matrix.target }}
+      - if: matrix.target == 'wasm'
+        run: cargo check --locked --target wasm32-unknown-unknown
+      - if: matrix.target == 'server'
+        run: cargo check --locked --no-default-features --features server
+      - if: matrix.target == 'storage'
+        run: cargo check --locked --no-default-features --features server,storage-s3
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: dtolnay/rust-toolchain@a5f673d0ba8626c3977bb416a1612774bc82181b
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@49a0bdc70d2e1b713ca9e2869b211fcce03d3c1c
+        with:
+          key: lint
+      - run: cargo fmt --all --check
+      - run: cargo clippy --locked --target wasm32-unknown-unknown -- -D warnings
+      - run: cargo clippy --locked --no-default-features --features server -- -D warnings
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: dtolnay/rust-toolchain@a5f673d0ba8626c3977bb416a1612774bc82181b
+        with:
+          toolchain: stable
+      - uses: Swatinem/rust-cache@49a0bdc70d2e1b713ca9e2869b211fcce03d3c1c
+        with:
+          key: test
+      - name: PostgreSQL test tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql postgresql-client libpq-dev
+          pg_config --bindir >> "$GITHUB_PATH"
+      - name: Install task runner
+        run: cargo install just --version 1.40.0 --locked
+      - run: cargo test --locked --no-default-features --features server -- --test-threads=4
+      - run: python3 -m unittest discover -s scripts/tests -p 'test_*.py' -v
+      - run: python3 -m unittest discover -s docker/codex-cloud -p 'test_*.py' -v
+      - run: bash scripts/tests/test-isolated-dev-config.sh
+      - run: bash scripts/tests/test-check-schema-plan.sh
+      - run: bash -n scripts/*.sh docker/codex-cloud/*.sh docker/development/*.sh entrypoint.sh
+  credentials:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - run: bash scripts/check-tracked-secrets.sh
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: dtolnay/rust-toolchain@a5f673d0ba8626c3977bb416a1612774bc82181b
+        with:
+          toolchain: stable
+      - uses: Swatinem/rust-cache@49a0bdc70d2e1b713ca9e2869b211fcce03d3c1c
+        with:
+          key: audit
+          cache-bin: true
+      - run: cargo install cargo-audit --version 0.22.2 --locked
+      - run: bash scripts/security-audit.sh
