@@ -87,7 +87,7 @@ the cloud guide for approval and trust setup.
 2. The local mock provider lets you use a synthetic identity. Complete its form.
 3. Create a uniquely labeled test note; save, reopen, edit and delete it.
 4. Change your profile display name and verify it persists after reload.
-5. In Accounts link the mock GitHub provider, then verify at least one method
+5. In Settings → Sign-in methods link the mock GitHub provider, then verify at least one method
    remains linked. The local GitHub fixture deliberately has one fixed identity;
    use mock Google subjects for multiple independent synthetic accounts.
 6. Sign out and confirm `/notes/new` redirects to login.
@@ -98,6 +98,18 @@ the cloud guide for approval and trust setup.
 Run `just check`, `just lint`, `just test` and `just config-test` before publishing
 changes. Database tests spawn disposable PostgreSQL processes and never use a
 live app database. Host command examples assume the prerequisite tools are on PATH.
+
+## Explore the starter pages
+
+The public landing page is `/`; About is `/about`. Sign-in opens `/home` unless
+an existing protected-page return path was supplied. Home shows recent notes and
+quick actions, `/dashboard` shows real private Notes totals, and `/search` finds
+text in your own notes. `/account` shows your account details. `/settings` links to
+profile/sign-in settings and lets you choose a browser-persisted light/dark theme.
+
+See docs/pages.md for the complete route inventory and the files to adapt when
+replacing Notes with your app’s domain. Dashboard and Search use the existing
+plain PostgreSQL schema and require no extra extension, service or search API key.
 
 ## Move to hosting
 

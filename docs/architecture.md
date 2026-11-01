@@ -32,14 +32,18 @@ app's deployment-specific identifiers when generating another app.
 ## Replace the example feature
 
 The Notes feature is in `src/pages/notes.rs`, `src/api/notes.rs`, `src/types.rs`
-(the Note model), and the notes table/index in migrations/schema.sql. It demonstrates
+(the Note model), and the notes table/index in migrations/schema.sql. The Home,
+Dashboard and Search example read models also use Notes through
+`src/api/workspace.rs`; replace those queries with the new product’s domain.
+The example demonstrates
 private ownership checks, bounded fields, manual saving, update/reopen, confirmation
 before deletion and recoverable feedback. Lists show the most recent 100 notes.
 
 When adding your real feature, retain those authorization patterns and add suitable
 pagination, per-user quotas and concurrency limits for its resource usage. Add
 business rules in the feature module; do not embed them in the auth or pool code.
-Update the route inventory, protected paths and navigation together. Keep the
+Update the route inventory, protected paths and navigation together. See
+[pages.md](pages.md) for the starter routes. Keep the
 owner predicate in reads, updates and deletes, and test a different user's access.
 
 Product-specific schemas should evolve additively once deployed. An undeployed

@@ -30,7 +30,8 @@ network policy checks, proxy/CA trust, disk inspection and image reuse. Execute
 within the user's authorization using the normal tool approval mechanisms.
 
 Start a named disposable instance such as `my-app-dev`. Use its printed canonical
-origin consistently. Complete local synthetic Google sign-in and the Notes
+origin consistently. Check the starter page inventory in docs/pages.md. Complete local synthetic
+Google sign-in and the Notes
 create/save/reopen/edit/delete workflow. Verify profile updates, account linking,
 logout and protected-page behavior. Run the browser smoke script and inspect its
 desktop/mobile screenshots. Run applicable code/configuration checks. Report

@@ -34,9 +34,10 @@ The setup guide explains which account-console steps only the user can complete.
 
 ## Architecture and changes
 
-Read `docs/architecture.md` and `docs/security.md`. `src/auth` and middleware are
+Read `docs/architecture.md`, `docs/pages.md` and `docs/security.md`. `src/auth` and middleware are
 reusable foundations; `src/pages/notes.rs`, `src/api/notes.rs` and the `notes`
-table are the replaceable example. Keep infrastructure and feature policy apart.
+table are the replaceable example. `src/api/workspace.rs` also supplies the
+Notes-based Dashboard/Search read models. Keep infrastructure and feature policy apart.
 Server functions must authorize on the server; hiding a route is insufficient.
 Capture the initiating account for forms, check exact Origin on mutations, and
 keep the session lock through the write transaction. Scope every resource query

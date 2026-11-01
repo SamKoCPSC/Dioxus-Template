@@ -25,11 +25,13 @@ use crate::db;
 ///
 /// Handles both exact matches and parameterized routes like `/notes/:uuid`.
 fn is_protected_path(path: &str) -> bool {
-    path == "/dashboard"
-        || path == "/notes"
+    let path = path.trim_end_matches('/');
+    matches!(
+        path,
+        "/home" | "/dashboard" | "/search" | "/account" | "/settings"
+    ) || path == "/notes"
         || path.starts_with("/notes/")
-        || path == "/settings/profile"
-        || path == "/settings/accounts"
+        || path.starts_with("/settings/")
 }
 
 /// Routes that redirect authenticated users away.
@@ -73,7 +75,7 @@ pub async fn handle_auth(
 
     // Redirect authenticated users away from login
     if is_authenticated && is_redirect_if_authed {
-        return redirect_to("/dashboard");
+        return redirect_to("/home");
     }
 
     // Redirect unauthenticated users from protected paths to login
@@ -201,5 +203,53 @@ mod tests {
             percent_encoding::utf8_percent_encode(path, percent_encoding::NON_ALPHANUMERIC)
         );
         assert_eq!(response.headers()[axum::http::header::LOCATION], expected);
+    }
+}
+
+#[cfg(test)]
+mod starter_page_tests {
+    use super::*;
+    use tower::ServiceExt;
+
+    #[tokio::test]
+    async fn starter_private_pages_gate_guests_and_public_about_stays_public() {
+        let pool = sqlx::postgres::PgPoolOptions::new()
+            .connect_lazy("postgres://test:test@127.0.0.1/test")
+            .unwrap();
+        let router = axum::Router::new()
+            .fallback(|| async { axum::response::Html("public") })
+            .layer(axum::middleware::from_fn_with_state(pool, handle_auth));
+        for target in [
+            "/home",
+            "/home/",
+            "/dashboard",
+            "/search?q=100%25_%20%26%20ideas",
+            "/account",
+            "/settings",
+            "/settings/",
+            "/settings/profile",
+            "/settings/accounts",
+        ] {
+            let response = router
+                .clone()
+                .oneshot(Request::builder().uri(target).body(Body::empty()).unwrap())
+                .await
+                .unwrap();
+            assert_eq!(response.status(), StatusCode::FOUND, "{target}");
+            let encoded =
+                percent_encoding::utf8_percent_encode(target, percent_encoding::NON_ALPHANUMERIC);
+            assert_eq!(
+                response.headers()[axum::http::header::LOCATION],
+                format!("/login?redirect_uri={encoded}")
+            );
+        }
+        for target in ["/", "/about"] {
+            let response = router
+                .clone()
+                .oneshot(Request::builder().uri(target).body(Body::empty()).unwrap())
+                .await
+                .unwrap();
+            assert_eq!(response.status(), StatusCode::OK);
+        }
     }
 }
