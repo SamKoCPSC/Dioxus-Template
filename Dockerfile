@@ -47,8 +47,10 @@ COPY --from=pgschema-builder /go/bin/pgschema /usr/local/bin/pgschema
 COPY --from=build-check /usr/src/app/target/dx/app/release/web/ /usr/local/app
 COPY --from=build-check /usr/src/app/migrations/ /usr/local/app/migrations/
 COPY entrypoint.sh /usr/local/app/entrypoint.sh
-RUN chmod 0555 /usr/local/app /usr/local/app/entrypoint.sh \
-    && chmod -R go-w /usr/local/app
+# Private checkout umasks can produce 0600 files and 0700 directories.
+# The non-root runtime must be able to read migrations and serve bundled assets.
+RUN chmod -R a+rX,go-w /usr/local/app \
+    && chmod 0555 /usr/local/app /usr/local/app/entrypoint.sh
 
 USER app
 WORKDIR /usr/local/app

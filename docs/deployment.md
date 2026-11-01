@@ -115,3 +115,32 @@ report the named blocker without exposing credentials or bypassing the policy.
 Desktop/native mobile packaging, billing, teams/roles and live media-upload
 workflows require additional product implementation and are not claimed by this
 web starter.
+
+## Local production-mode validation
+
+A local deployment test should exercise the release runtime and entrypoint with
+APP_ENV=production. Build the image with `docker build --tag my-app:local .` on a
+machine with adequate Docker disk and memory. Use a new disposable PostgreSQL
+instance with separate owner/runtime roles and a local HTTPS reverse proxy. Keep
+synthetic provider endpoints behind trusted local HTTPS too: production validation
+rejects HTTP endpoints and development placeholder credentials. Generate synthetic
+secrets directly into a private environment file outside the repository.
+
+Trust the local test CA explicitly in the app and an isolated browser profile;
+do not turn off certificate validation. Retain managed-cloud proxy/CA settings
+for public downloads. If Docker client proxy defaults are configured, explicitly
+pass NO_PROXY and no_proxy for the owned local fixture hostnames; env-file entries
+can be superseded by those defaults. Preserve other proxy settings and do not add
+public destinations merely to route around policy.
+
+Verify the --prepare-database entrypoint, startup/health, non-root identity,
+restricted runtime privileges, readable migrations and real browser CRUD/logout.
+Check cookie metadata without values. Restart the app and verify preparation is
+idempotent and authenticated data persists. Review desktop/mobile screenshots,
+then remove the owned fixture's containers, volume, synthetic data, private keys
+and browser state. Report any substituted build stages precisely; a successful
+runtime smoke test is not proof of a cold image build, provider registration,
+image publication or Railway deployment.
+
+See [extraction-validation.md](extraction-validation.md) for the initial local
+production test results and the focused private-checkout permission fix.

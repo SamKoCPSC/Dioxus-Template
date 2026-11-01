@@ -76,6 +76,33 @@ Rust's default). The override avoids adding container-only linker flags to that
 host cache. Review compiler/target/profile compatibility; a cache is not evidence
 of a fresh successful check.
 
+## Release-bundle optimizer
+
+Release bundling also invokes wasm-opt. Dioxus CLI 0.7.9's downloader does not
+honor the managed session's extra CA roots. Prefetch the pinned optimizer using
+the inherited proxy and trusted CA, verify its checksum before execution, and
+place its `bin/wasm-opt` and `lib/` files beneath
+`$DX_HOME/tools/binaryen-129/`. The cache name is 129 in this CLI even though its
+Linux download URL selects Binaryen 127; recheck both when upgrading the CLI.
+
+Validated Linux amd64 archive:
+`https://github.com/WebAssembly/binaryen/releases/download/version_127/binaryen-version_127-x86_64-linux.tar.gz`
+
+SHA-256:
+`c8ebe5d00c978601086bcad33b2c80fcfe33d6a8b87b754ba4ea86a9a16cc316`
+
+Extract only the needed regular files into the owned external tool cache. Keep
+the executable/library layout intact and TLS validation enabled. Do not copy
+session trust files or private runtime configuration into the release image.
+
+On a constrained vfs executor, an isolated compatible builder with an executable
+memory-backed Cargo target can avoid compiler output filling Docker's disk.
+Check available memory first, keep an exclusive build window and copy the final
+bundle out before stopping that builder. This does not replace validation of the
+full multi-stage Dockerfile on an adequately sized builder. See
+[local production results](../../docs/extraction-validation.md) and the local
+production validation section of [deployment.md](../../docs/deployment.md).
+
 ## Host-run fallback for constrained executors
 
 When compatible host Rust and Dioxus tools are already available but `vfs`
