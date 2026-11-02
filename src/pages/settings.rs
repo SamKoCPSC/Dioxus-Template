@@ -1,14 +1,14 @@
 use crate::components::ClientForm;
 use crate::{
     auth::{account_binding::use_form_account, context::AuthContext},
-    components::AuthRequired,
+    components::{AuthRequired, PageHeading, SettingsNav},
     Route,
 };
 use dioxus::prelude::*;
 #[component]
 pub fn Profile() -> Element {
     let auth = crate::auth::context::use_auth();
-    rsx! {AuthRequired{if let Some(profile)=auth.current_user{ProfileForm{profile}}}}
+    rsx! {AuthRequired{SettingsNav{} if let Some(profile)=auth.current_user{ProfileForm{profile}}}}
 }
 #[component]
 fn ProfileForm(profile: crate::auth::context::UserProfile) -> Element {
@@ -38,7 +38,7 @@ pub fn Accounts() -> Element {
     let mut feedback = use_signal(|| None::<String>);
     let canonical =
         try_use_context::<crate::auth::local_origin::LocalCanonicalOrigin>().unwrap_or_default();
-    rsx! {AuthRequired{section{class:"card editor",h1{"Sign-in methods"}p{"Link another provider while signed in. Keep at least one method linked."}
+    rsx! {AuthRequired{SettingsNav{} section{class:"card editor",h1{"Sign-in methods"}p{"Link another provider while signed in. Keep at least one method linked."}
      if let Some(message)=feedback(){p{role:"status","{message}"}}
      match accounts.read().as_ref(){
       None=>rsx!{p{role:"status","Loading sign-in methods…"}},
@@ -50,4 +50,66 @@ pub fn Accounts() -> Element {
      div{class:"actions",a{class:"btn btn-secondary",href:canonical.on_canonical_origin("/auth/google/start?purpose=link&redirect_uri=%2Fsettings%2Faccounts"),"Link Google"}a{class:"btn btn-secondary",href:canonical.on_canonical_origin("/auth/github/start?purpose=link&redirect_uri=%2Fsettings%2Faccounts"),"Link GitHub"}}
      Link{to:Route::Profile{},"Back to profile"}
     }}}
+}
+
+#[component]
+pub fn Settings() -> Element {
+    let theme = use_context::<crate::utils::theme::UseTheme>();
+    rsx! {
+        AuthRequired {
+            PageHeading { title: "Settings", description: "Make your workspace feel like yours.",
+                Link { to: Route::Account {}, class: "btn btn-secondary", "View account" }
+            }
+            SettingsNav {}
+            section { class: "quick-links", aria_label: "Account settings",
+                Link { to: Route::Profile {}, class: "card quick-link", h2 { "Edit your profile" } p { "Update your display name and bio." } }
+                Link { to: Route::Accounts {}, class: "card quick-link", h2 { "Manage sign-in methods" } p { "Connect a provider or review your linked accounts." } }
+                Link { to: Route::Account {}, class: "card quick-link", h2 { "Review your account" } p { "View the details associated with your workspace." } }
+            }
+            section { class: "card page-section", id: "appearance",
+                h2 { "Appearance" }
+                p { class: "muted", "Choose a color scheme. This preference is saved in this browser." }
+                div { class: "theme-options", role: "group", aria_label: "Color scheme",
+                    button { r#type: "button", class: "btn btn-secondary theme-choice", aria_pressed: !theme.is_dark(),
+                        onclick: move |_| { if theme.is_dark() { theme.toggle(); } }, "Light appearance" }
+                    button { r#type: "button", class: "btn btn-secondary theme-choice", aria_pressed: theme.is_dark(),
+                        onclick: move |_| { if !theme.is_dark() { theme.toggle(); } }, "Dark appearance" }
+                }
+            }
+        }
+    }
+}
+
+#[component]
+pub fn Account() -> Element {
+    let auth = crate::auth::context::use_auth();
+    rsx! {
+        AuthRequired {
+            PageHeading { title: "Your account", description: "Your identity and the details of your workspace.",
+                Link { to: Route::Profile {}, class: "btn btn-primary", "Edit profile" }
+            }
+            SettingsNav {}
+            if let Some(profile) = auth.current_user {
+                section { class: "card account-summary",
+                    div { class: "account-monogram", aria_hidden: "true", {profile.username.chars().next().unwrap_or('U').to_uppercase().to_string()} }
+                    div { class: "account-details",
+                        h2 { if profile.display_name.trim().is_empty() { "{profile.username}" } else { "{profile.display_name}" } }
+                        p { class: "muted", "@{profile.username}" }
+                        dl { class: "detail-list",
+                            div { dt { "Email" } dd { if profile.email.starts_with("noreply+") && profile.email.ends_with("@placeholder") { "Not provided" } else { "{profile.email}" } } }
+                            div { dt { "Bio" } dd { if let Some(bio) = profile.bio.filter(|b| !b.trim().is_empty()) { "{bio}" } else { "You haven’t added a bio yet." } } }
+                        }
+                    }
+                }
+            } else { p { role: "status", "Loading your account…" } }
+            section { class: "card page-section",
+                h2 { "Sign-in and appearance" }
+                p { "Review your connected providers or choose a color scheme that feels comfortable." }
+                div { class: "actions",
+                    Link { to: Route::Accounts {}, class: "btn btn-secondary", "Manage sign-in methods" }
+                    Link { to: Route::Settings {}, class: "btn btn-secondary", "Open settings" }
+                }
+            }
+        }
+    }
 }

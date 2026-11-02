@@ -43,6 +43,10 @@ Docker copy-on-create disk use prevents a full development container.
 - Profiles, linked sign-in methods, stale-account form protection and sign-in
   refresh. Native accessible confirmation dialogs, light/dark theme, responsive
   layouts, and reusable interaction primitives.
+- Public landing/About pages, signed-in Home and Dashboard, private Search,
+  Account overview and a Settings hub with browser-persisted appearance controls.
+- Reusable accessible side drawer, used by responsive app navigation, with native
+  modal focus/scroll handling and start/end placement.
 - Owner-scoped private Notes CRUD as a small feature example.
 - Plain PostgreSQL 17, declarative `pgschema` setup, per-test disposable databases,
   and separate production migration/runtime roles.
@@ -70,6 +74,7 @@ login deployment are excluded.
 | Local browser workflow | `just browser instance=my-app-dev` |
 | New app setup | [docs/new-app-setup.md](docs/new-app-setup.md) |
 | Agent-guided setup | [docs/agent-setup.md](docs/agent-setup.md) |
+| Starter pages and search behavior | [docs/pages.md](docs/pages.md) |
 | Architecture and extension points | [docs/architecture.md](docs/architecture.md) |
 | Production deployment | [docs/deployment.md](docs/deployment.md) |
 | Security properties | [docs/security.md](docs/security.md) |

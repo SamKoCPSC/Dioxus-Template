@@ -16,18 +16,29 @@ mod test_utils;
 mod types;
 mod utils;
 use components::AppLayout;
-use pages::{Accounts, EditNote, Home, Login, NewNote, NotFound, Notes, Profile};
+use pages::{
+    About, Account, Accounts, Dashboard, EditNote, Home, Landing, Login, NewNote, NotFound, Notes,
+    Profile, Search, Settings,
+};
 #[derive(Debug, Clone, Routable, PartialEq)]
 pub enum Route {
     #[layout(AppLayout)]
     #[route("/")]
+    Landing {},
+    #[route("/home")]
     Home {},
-    #[route("/login?:redirect_uri&:error")]
-    Login {
-        redirect_uri: Option<String>,
-        error: Option<String>,
-    },
-    #[redirect("/dashboard",|| Self::Notes {})]
+    #[route("/dashboard")]
+    Dashboard {},
+    #[route("/search")]
+    Search {},
+    #[route("/about")]
+    About {},
+    #[route("/account")]
+    Account {},
+    #[route("/settings")]
+    Settings {},
+    #[route("/login")]
+    Login {},
     #[route("/notes")]
     Notes {},
     #[route("/notes/new")]
@@ -206,5 +217,28 @@ fn App() -> Element {
      document::Meta { name:"viewport",content:"width=device-width, initial-scale=1, viewport-fit=cover" }
      document::Link { rel:"stylesheet",href:asset!("/assets/app.css") }
      ErrorBoundary { handle_error:move|_|rsx!{section{class:"container card",h1{"Something went wrong"}p{"Reload this page to try again."}a{href:"/",class:"btn btn-primary","Go home"}}}, Router::<Route>{} }
+    }
+}
+
+#[cfg(test)]
+mod starter_route_tests {
+    use super::Route;
+
+    #[test]
+    fn public_landing_and_private_home_have_distinct_routes() {
+        assert_eq!("/".parse::<Route>().unwrap(), Route::Landing {});
+        assert_eq!("/home".parse::<Route>().unwrap(), Route::Home {});
+        assert_eq!("/dashboard".parse::<Route>().unwrap(), Route::Dashboard {});
+        assert_eq!("/account".parse::<Route>().unwrap(), Route::Account {});
+        assert_eq!("/settings".parse::<Route>().unwrap(), Route::Settings {});
+        assert_eq!("/about".parse::<Route>().unwrap(), Route::About {});
+    }
+
+    #[test]
+    fn search_route_matches_query_urls_without_decoding_their_contents() {
+        assert_eq!(
+            "/search?q=100%25_+%26+ideas".parse::<Route>().unwrap(),
+            Route::Search {}
+        );
     }
 }

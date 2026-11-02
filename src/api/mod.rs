@@ -1,5 +1,6 @@
 pub mod account;
 pub mod notes;
+pub mod workspace;
 #[cfg(feature = "server")]
 pub(crate) async fn mutation_identity(
     expected: Option<uuid::Uuid>,
