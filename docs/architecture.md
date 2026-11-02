@@ -21,6 +21,9 @@ app's deployment-specific identifiers when generating another app.
 - `src/components/base/`: buttons, cards, inputs, native dialogs, menus, feedback,
   and keyboard/focus lifecycle helpers. Their tests cover interaction logic;
   not every primitive is needed by the example UI.
+- `src/components/base/shared_drawer.rs`: route-independent side panel built on
+  the shared modal lifecycle; `src/components/navigation.rs` composes app links
+  and account actions inside it. See pages.md for usage and dismissal contracts.
 - `src/utils/`: theme persistence and mobile viewport/keyboard helpers.
 - `src/storage.rs`: optional server-only S3 adapter, compiled with `storage-s3`.
   See storage.md for its deliberate public-media boundary and extension work.

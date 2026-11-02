@@ -7,6 +7,7 @@ pub use empty_state::*;
 pub use feedback::*;
 pub use input::*;
 pub use loading_spinner::*;
+pub use shared_drawer::*;
 pub use shared_modal::*;
 mod action_menu;
 mod button;
@@ -17,6 +18,7 @@ mod input;
 mod loading_spinner;
 #[cfg(any(target_arch = "wasm32", test))]
 mod modal_lifecycle;
+mod shared_drawer;
 mod shared_modal;
 #[cfg(target_arch = "wasm32")]
 pub(crate) use modal_lifecycle::browser::set_form_modals_suspended;

@@ -13,6 +13,7 @@ use super::modal_lifecycle::browser::{dispose_modal, sync_modal, wrap_modal_tab}
 pub fn SharedModal(
     aria_labelledby: String,
     focus_selector: String,
+    #[props(default)] class: String,
     #[props(default)] pending: bool,
     #[props(default = true)] dismiss_on_backdrop: bool,
     on_dismiss: EventHandler<()>,
@@ -39,7 +40,7 @@ pub fn SharedModal(
     rsx! {
         dialog {
             id,
-            class: "modal-overlay shared-modal",
+            class: "modal-overlay shared-modal {class}",
             aria_labelledby,
             aria_modal: "true",
             aria_busy: pending,

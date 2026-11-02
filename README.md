@@ -45,6 +45,8 @@ Docker copy-on-create disk use prevents a full development container.
   layouts, and reusable interaction primitives.
 - Public landing/About pages, signed-in Home and Dashboard, private Search,
   Account overview and a Settings hub with browser-persisted appearance controls.
+- Reusable accessible side drawer, used by responsive app navigation, with native
+  modal focus/scroll handling and start/end placement.
 - Owner-scoped private Notes CRUD as a small feature example.
 - Plain PostgreSQL 17, declarative `pgschema` setup, per-test disposable databases,
   and separate production migration/runtime roles.

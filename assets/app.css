@@ -48,6 +48,28 @@
 .about-privacy{margin-top:2rem}
 .hero>.btn{margin-right:.5rem;margin-bottom:.5rem}
 .footer{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.drawer-overlay{position:fixed;inset-block:0;inset-inline:0 auto;margin:0;width:min(24rem,calc(100% - 2rem));max-width:none;height:100dvh;max-height:100dvh;overflow:visible}
+.drawer-overlay--end{inset-inline:auto 0}
+.drawer-panel{height:100%;display:flex;flex-direction:column;background:var(--surface);border-inline-end:1px solid var(--border);box-shadow:0 0 3rem #07112533;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.drawer-overlay--end .drawer-panel{border-inline-end:0;border-inline-start:1px solid var(--border)}
+.drawer-header{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.25rem;border-bottom:1px solid var(--border);flex-shrink:0}
+.drawer-header h2{margin:0;font-size:1.4rem;overflow-wrap:anywhere}
+.drawer-close{flex-shrink:0;width:44px;padding:.5rem}
+.drawer-content{padding:1.25rem;overflow-y:auto;overscroll-behavior:contain;min-height:0}
+.drawer-identity{font-size:.9rem;color:var(--text-secondary);overflow-wrap:anywhere}
+.drawer-identity strong{color:var(--text)}
+.drawer-links{display:flex;flex-direction:column;gap:.3rem}
+.drawer-links a{display:flex;align-items:center;min-height:44px;padding:.65rem .8rem;border-radius:.6rem;text-decoration:none;color:var(--text)}
+.drawer-links a:hover{background:var(--bg)}
+.drawer-links .is-active{color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);font-weight:650}
+.drawer-actions{display:flex;flex-direction:column;gap:.75rem;margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border)}
+.drawer-actions .btn,.drawer-actions form{width:100%}
+@media(max-width:850px){
+ .nav .nav-links,.nav .header-theme{display:none}
+ .nav{flex-wrap:nowrap;gap:.6rem}
+ .nav .brand{flex:1;min-width:0;max-width:none;margin-right:auto;font-size:1rem}
+ .nav-actions{flex-shrink:0;flex-wrap:nowrap;gap:.5rem}
+}
 @media(max-width:650px){
  .nav{gap:.5rem}
  .brand{flex:1 1 auto;flex-basis:auto;max-width:calc(100% - 10rem);font-size:1rem;margin-right:0}

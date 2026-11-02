@@ -17,6 +17,79 @@ def instance_metadata(args):
     values=dict(line.split('=',1) for line in path.read_text().splitlines() if '=' in line)
     return values['STATE'],values['APP_URL'],values['SESSION_COOKIE_NAME']
 
+async def exercise_drawer(page,output,prefix,signed_in):
+    from playwright.async_api import expect
+    trigger=page.get_by_role('button',name='Open navigation menu',exact=True)
+    dialog=page.get_by_role('dialog',name='Navigation',exact=True)
+    close=dialog.get_by_role('button',name='Close drawer',exact=True)
+    original=await page.evaluate("[document.documentElement,document.body].map(e=>[e.style.getPropertyValue('overflow'),e.style.getPropertyPriority('overflow')])")
+    await trigger.click()
+    await expect(dialog).to_be_visible()
+    await expect(trigger).to_have_attribute('aria-expanded','true')
+    await expect(close).to_be_focused()
+    assert await page.evaluate("[document.documentElement,document.body].every(e=>getComputedStyle(e).overflow==='hidden')")
+    await dialog.get_by_role('heading',name='Navigation',exact=True).click()
+    await expect(dialog).to_be_visible()
+    # Explicit wrap in both directions and native background inertness.
+    await close.focus()
+    await page.keyboard.press('Shift+Tab')
+    await expect(dialog.get_by_role('button',name='Toggle navigation theme',exact=True)).to_be_focused()
+    await page.keyboard.press('Tab')
+    await expect(close).to_be_focused()
+    assert await page.evaluate("(()=>{document.querySelector('.brand').focus();return document.querySelector('dialog[open]').contains(document.activeElement)})()")
+    await expect(dialog.get_by_role('link',name='Dashboard',exact=True)).to_have_count(1 if signed_in else 0)
+    await expect(dialog.get_by_role('link',name='Sign in',exact=True)).to_have_count(0 if signed_in else 1)
+    assert not await page.evaluate('document.documentElement.scrollWidth>innerWidth')
+    await page.screenshot(path=str(output/(prefix+'-drawer.png')),full_page=False)
+    await page.keyboard.press('Escape')
+    await expect(dialog).to_have_count(0)
+    await expect(trigger).to_be_focused()
+    await expect(trigger).to_have_attribute('aria-expanded','false')
+    assert await page.evaluate("[document.documentElement,document.body].map(e=>[e.style.getPropertyValue('overflow'),e.style.getPropertyPriority('overflow')])")==original
+    await trigger.click()
+    bounds=await dialog.bounding_box()
+    viewport=page.viewport_size
+    await page.mouse.click(min(viewport['width']-2,bounds['x']+bounds['width']+12),40)
+    await expect(dialog).to_have_count(0)
+    await expect(trigger).to_be_focused()
+    await trigger.click()
+    await close.click()
+    await expect(dialog).to_have_count(0)
+    await expect(trigger).to_be_focused()
+    await trigger.click()
+    await dialog.get_by_role('link',name='Home',exact=True).click()
+    await expect(dialog).to_have_count(0)
+    # Selecting the current route must dismiss too.
+    await trigger.click()
+    await dialog.get_by_role('link',name='Home',exact=True).click()
+    await expect(dialog).to_have_count(0)
+    # Browser history changes also close a drawer without a link click inside it.
+    await trigger.click()
+    await dialog.get_by_role('link',name='About',exact=True).click()
+    await page.wait_for_url('**/about')
+    await expect(dialog).to_have_count(0)
+    await trigger.click()
+    await expect(dialog).to_be_visible()
+    await page.go_back(wait_until='networkidle')
+    await expect(dialog).to_have_count(0)
+    assert urlsplit(page.url).path==('/home' if signed_in else '/')
+    if prefix=='mobile':
+        await trigger.click()
+        await dialog.get_by_role('button',name='Toggle navigation theme',exact=True).click()
+        await page.wait_for_function("document.documentElement.classList.contains('dark')")
+        await page.screenshot(path=str(output/'mobile-drawer-dark.png'),full_page=False)
+        await dialog.get_by_role('button',name='Toggle navigation theme',exact=True).click()
+        await page.wait_for_function("!document.documentElement.classList.contains('dark')")
+        await close.click()
+        await page.set_viewport_size({'width':844,'height':390})
+        await trigger.click()
+        await dialog.get_by_role('button',name='Toggle navigation theme',exact=True).scroll_into_view_if_needed()
+        assert await dialog.locator('.drawer-content').evaluate('e=>e.scrollTop>0')
+        await page.screenshot(path=str(output/'mobile-drawer-landscape.png'),full_page=False)
+        await close.click()
+        await page.set_viewport_size({'width':390,'height':844})
+    assert await page.evaluate("[document.documentElement,document.body].map(e=>[e.style.getPropertyValue('overflow'),e.style.getPropertyPriority('overflow')])")==original
+
 async def check(args):
     from playwright.async_api import async_playwright,expect
     state,base,cookie_name=instance_metadata(args)
@@ -53,6 +126,9 @@ async def check(args):
             await page.wait_for_function("!document.documentElement.classList.contains('dark')")
             await page.screenshot(path=str(output/'desktop-landing.png'),full_page=True)
             passed('Public home and interactive theme hydration')
+            phase='guest drawer keyboard, dismissal and navigation'
+            await exercise_drawer(page,output,'desktop-guest',False)
+            passed('Guest drawer focus trap, inert background, dismissal, restoration and same-route navigation')
             phase='public About and private route gates'
             await page.get_by_role('link',name='About',exact=True).click()
             await expect(page.get_by_role('heading',name='A little space for what matters.',exact=True)).to_be_visible()
@@ -77,6 +153,9 @@ async def check(args):
             assert cookie['httpOnly'] and cookie['sameSite']=='Lax' and cookie['path']=='/' and not cookie['secure']
             assert cookie['domain']==url.hostname and 850<=cookie['expires']-time.time()<=901
             passed('Synthetic browser-bound OAuth and local cookie metadata')
+            phase='authenticated drawer navigation'
+            await exercise_drawer(page,output,'desktop',True)
+            passed('Signed-in drawer destinations and navigation')
             phase='starter home, dashboard and empty search'
             await page.get_by_role('link',name='Home',exact=True).click()
             await expect(page.get_by_role('heading',name='Home',exact=True)).to_be_visible()
@@ -195,6 +274,9 @@ async def check(args):
                 if path=='/home' or path.startswith('/search?'):await expect(mp.get_by_role('heading',name=label,exact=True)).to_be_visible()
                 assert not await mp.evaluate('document.documentElement.scrollWidth>innerWidth')
                 await mp.screenshot(path=str(output/filename),full_page=True)
+            phase='mobile drawer and landscape scrolling'
+            await exercise_drawer(mp,output,'mobile',True)
+            passed('Mobile drawer, shared theme and short-viewport scrolling')
             await mobile.close()
             passed('Mobile editor/dialog and all six starter pages without horizontal overflow')
             phase='settings appearance persistence and account overview'
@@ -263,8 +345,9 @@ async def check(args):
             passed('Dashboard and Search reflect deletion without stale results')
             phase='logout and server-side session revocation'
             old_state=await context.storage_state() # In-memory only, never serialized to disk/logs.
+            await page.get_by_role('button',name='Open navigation menu',exact=True).click()
             async with page.expect_response(lambda response:urlsplit(response.url).path=='/auth/logout') as logout:
-                await page.get_by_role('button',name='Sign out',exact=True).click()
+                await page.get_by_role('dialog',name='Navigation',exact=True).get_by_role('button',name='Sign out',exact=True).click()
             assert (await logout.value).status in (302,303)
             await page.wait_for_load_state('networkidle')
             assert not any(cookie['name']==cookie_name for cookie in await context.cookies())

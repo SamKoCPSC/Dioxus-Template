@@ -26,6 +26,50 @@ Settings; About is in the footer. Settings has its own overview/account/profile/
 sign-in navigation. Appearance uses the same reactive state as the header toggle
 and is saved in this browser, not in a server-side account preference.
 
+## Navigation drawer
+
+The header’s Menu opens a side drawer on desktop and mobile. Below 850px the
+drawer replaces the row of primary links. It includes public destinations for
+guests and the signed-in workspace/account destinations for authenticated users.
+Its appearance control shares the header/Settings theme state. Sign-out remains
+a native POST; keep that form mounted until submission completes. The Menu
+trigger is disabled until hydration; ordinary sign-in/sign-out links/forms remain
+available in the header.
+
+`src/components/base/shared_drawer.rs` exports `SharedDrawer` and `DrawerSide`.
+This generic component was extracted from Noms’ navigation panel and builds on
+`SharedModal`, with no dependency on app routes, authentication or product copy.
+The navigation composition lives in `src/components/navigation.rs`.
+
+```rust
+let mut open = use_signal(|| false);
+rsx! {
+    button { onclick: move |_| open.set(true), "Open details" }
+    if open() {
+        SharedDrawer {
+            title: "Details",
+            side: DrawerSide::End,
+            on_dismiss: move |_| open.set(false),
+            p { "Your app’s panel content goes here." }
+        }
+    }
+}
+```
+
+Import the types from `crate::components::base`. `title` labels the dialog and
+`side` defaults to `Start` (logical inline start; `End` reverses it). Mount only
+while open. The component supplies a heading and close button, focuses Close on
+open, wraps Tab/Shift+Tab, uses native modal background inertness, locks page
+scrolling, and restores prior focus/scroll styles on unmount. Close, Escape and
+backdrop invoke `on_dismiss`; clicks inside do not. Content scrolls independently
+on small/landscape screens. Styling uses the app’s existing color tokens and safe
+area insets; there is no motion to disable.
+
+The navigation caller dismisses on destination clicks (including the current
+route), URL/history changes and authenticated identity changes. Other consumers
+should define their own navigation/dismissal policy. Put new destinations in
+`navigation.rs`, keeping the route gate and server authorization in sync.
+
 ## Dashboard and Search contracts
 
 `src/api/workspace.rs` derives the owner from the verified server session. The
@@ -59,6 +103,8 @@ upgrading that routing code.
 
 - `src/main.rs`: route inventory.
 - `src/components/mod.rs`: navigation and shared theme context.
+- `src/components/navigation.rs`: app header and drawer destinations/actions.
+- `src/components/base/shared_drawer.rs`: reusable side panel and placement.
 - `src/components/workspace.rs`: page headings, preview cards and settings tabs.
 - `src/pages/mod.rs`: public landing, About, sign-in and not-found pages.
 - `src/pages/workspace.rs`: Home, Dashboard, Search and raw search-query decoding.
