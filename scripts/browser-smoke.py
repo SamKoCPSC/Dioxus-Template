@@ -90,6 +90,62 @@ async def exercise_drawer(page,output,prefix,signed_in):
         await page.set_viewport_size({'width':390,'height':844})
     assert await page.evaluate("[document.documentElement,document.body].map(e=>[e.style.getPropertyValue('overflow'),e.style.getPropertyPriority('overflow')])")==original
 
+async def exercise_showcase(page,base,output,prefix):
+    from playwright.async_api import expect
+    response=await page.goto(base+'/dev/components',wait_until='networkidle')
+    assert response.status==200
+    await expect(page.get_by_role('heading',name='Component showcase',exact=True)).to_be_visible()
+    await page.get_by_role('textbox',name='Example project name',exact=True).fill('Synthetic showcase project')
+    await expect(page.get_by_role('heading',name='Synthetic showcase project',exact=True)).to_be_visible()
+    await page.get_by_role('button',name='Primary action',exact=True).click()
+    await expect(page.locator('.feedback-toast__message')).to_have_text('Primary example selected.')
+    await page.get_by_role('button',name='Dismiss notification',exact=True).click()
+    await expect(page.get_by_role('button',name='Disabled action',exact=True)).to_be_disabled()
+    await page.get_by_role('button',name='Show error notification',exact=True).click()
+    await expect(page.locator('.feedback-toast__message')).to_have_text('Example error: try that action again.')
+    await page.get_by_role('button',name='Dismiss notification',exact=True).click()
+    spinner=page.get_by_role('status',name='Loading',exact=True)
+    bounds=await spinner.bounding_box()
+    assert bounds['width']>0 and bounds['height']>0
+    await page.emulate_media(reduced_motion='reduce')
+    assert await spinner.evaluate("e=>getComputedStyle(e).animationName==='none'")
+    await page.emulate_media(reduced_motion='no-preference')
+    await page.get_by_role('button',name='Preview dark theme',exact=True).click()
+    await page.wait_for_function("document.documentElement.classList.contains('dark')")
+    await page.screenshot(path=str(output/(prefix+'-showcase-dark.png')),full_page=True)
+    await page.get_by_role('button',name='Preview light theme',exact=True).click()
+    await page.wait_for_function("!document.documentElement.classList.contains('dark')")
+    await page.screenshot(path=str(output/(prefix+'-showcase.png')),full_page=True)
+    trigger=page.get_by_role('button',name='Open example dialog',exact=True)
+    await trigger.click()
+    modal=page.get_by_role('dialog',name='Example dialog',exact=True)
+    await expect(modal.get_by_role('button',name='Cancel example',exact=True)).to_be_focused()
+    await page.keyboard.press('Shift+Tab')
+    await expect(modal.get_by_role('button',name='Confirm example',exact=True)).to_be_focused()
+    await page.keyboard.press('Escape')
+    await expect(modal).to_have_count(0)
+    await expect(trigger).to_be_focused()
+    await trigger.click()
+    await modal.get_by_role('button',name='Confirm example',exact=True).click()
+    await expect(modal).to_have_count(0)
+    await expect(page.locator('.feedback-toast__message')).to_have_text('Example confirmed.')
+    await page.get_by_role('button',name='Dismiss notification',exact=True).click()
+    drawer=page.get_by_role('dialog',name='Example drawer',exact=True)
+    for side in ['start','end']:
+        opener=page.get_by_role('button',name='Open '+side+' drawer',exact=True)
+        await opener.click()
+        await expect(drawer.get_by_role('button',name='Close drawer',exact=True)).to_be_focused()
+        bounds=await drawer.bounding_box()
+        if side=='start':assert abs(bounds['x'])<1
+        else:assert abs(bounds['x']+bounds['width']-page.viewport_size['width'])<1
+        await drawer.get_by_role('textbox',name='Drawer example input',exact=True).fill('Synthetic '+side+' panel')
+        await page.screenshot(path=str(output/(prefix+'-showcase-'+side+'-drawer.png')),full_page=False)
+        await page.keyboard.press('Escape')
+        await expect(drawer).to_have_count(0)
+        await expect(opener).to_be_focused()
+        await expect(page.get_by_role('heading',name='Synthetic '+side+' panel',exact=True)).to_be_visible()
+    assert not await page.evaluate('document.documentElement.scrollWidth>innerWidth')
+
 async def check(args):
     from playwright.async_api import async_playwright,expect
     state,base,cookie_name=instance_metadata(args)
@@ -106,8 +162,8 @@ async def check(args):
         result['checks'].append({'check':name,'passed':True,**metadata})
         print(json.dumps(result['checks'][-1]),flush=True)
     async with async_playwright() as p:
-        executable=args.chromium or shutil.which('chromium') or shutil.which('chromium-browser')
-        if not executable:raise ValueError('Install Chromium or provide --chromium PATH')
+        executable=args.chromium or shutil.which('chromium') or shutil.which('chromium-browser') or p.chromium.executable_path
+        if not Path(executable).is_file():raise ValueError('Install Chromium with Playwright or provide --chromium PATH')
         options={'executable_path':executable,'headless':True,'args':['--disable-dev-shm-usage']}
         proxy=os.environ.get('HTTPS_PROXY') or os.environ.get('HTTP_PROXY')
         if proxy:options['proxy']={'server':proxy,'bypass':'127.0.0.1,localhost,[::1]'}
@@ -126,6 +182,10 @@ async def check(args):
             await page.wait_for_function("!document.documentElement.classList.contains('dark')")
             await page.screenshot(path=str(output/'desktop-landing.png'),full_page=True)
             passed('Public home and interactive theme hydration')
+            if args.showcase:
+                phase='desktop component showcase'
+                await exercise_showcase(page,base,output,'desktop')
+                passed('Desktop component showcase, themed primitives, feedback, reduced motion and both drawer sides')
             phase='guest drawer keyboard, dismissal and navigation'
             await exercise_drawer(page,output,'desktop-guest',False)
             passed('Guest drawer focus trap, inert background, dismissal, restoration and same-route navigation')
@@ -277,6 +337,10 @@ async def check(args):
             phase='mobile drawer and landscape scrolling'
             await exercise_drawer(mp,output,'mobile',True)
             passed('Mobile drawer, shared theme and short-viewport scrolling')
+            if args.showcase:
+                phase='mobile component showcase'
+                await exercise_showcase(mp,base,output,'mobile')
+                passed('Mobile component showcase interactions and responsive layouts')
             await mobile.close()
             passed('Mobile editor/dialog and all six starter pages without horizontal overflow')
             phase='settings appearance persistence and account overview'
@@ -382,6 +446,7 @@ async def check(args):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--instance',required=True);parser.add_argument('--host',action='store_true')
+    parser.add_argument('--showcase',action='store_true',help='Require and exercise the local debug component showcase')
     parser.add_argument('--chromium');parser.add_argument('--output',type=Path,default=Path(os.environ.get('APP_BROWSER_OUTPUT',str(Path(tempfile.gettempdir())/'app-browser-artifacts'))))
     args=parser.parse_args()
     try:asyncio.run(check(args))

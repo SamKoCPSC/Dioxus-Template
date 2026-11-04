@@ -30,6 +30,8 @@ config-test:
     python3 -m unittest discover -s docker/codex-cloud -p 'test_*.py' -v
 browser instance:
     python3 scripts/browser-smoke.py --instance {{quote(instance)}}
+ci-browser output="../work/browser-ci":
+    python3 scripts/ci-browser.py --output {{quote(output)}}
 
 # Run Rust/Dioxus on the host; Docker supplies only disposable PG/mock providers.
 host-up instance:

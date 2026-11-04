@@ -14,6 +14,7 @@ are examples to adapt to each new app’s purpose and content.
 | Profile | `/settings/profile` | Signed in | Edit display name and bio |
 | Sign-in methods | `/settings/accounts` | Signed in | Link/unlink providers while keeping one method |
 | About | `/about` | Public | App introduction and a private-workspace explanation |
+| Components | `/dev/components` | Local debug only | Interactive shared-component previews |
 | Sign-in | `/login` | Guest | Google/GitHub OAuth entry points |
 | Notes | `/notes` | Signed in | Up to 100 recent notes |
 | New/edit note | `/notes/new`, `/notes/:id` | Signed in | Owner-scoped example CRUD |

@@ -24,6 +24,9 @@ app's deployment-specific identifiers when generating another app.
 - `src/components/base/shared_drawer.rs`: route-independent side panel built on
   the shared modal lifecycle; `src/components/navigation.rs` composes app links
   and account actions inside it. See pages.md for usage and dismissal contracts.
+- `src/pages/showcase.rs`: interactive component previews compiled into debug
+  builds, gated by validated local mode. `middleware/development.rs` returns 404
+  in hosted/release apps. See components.md for the showcase and browser CI.
 - `src/utils/`: theme persistence and mobile viewport/keyboard helpers.
 - `src/storage.rs`: optional server-only S3 adapter, compiled with `storage-s3`.
   See storage.md for its deliberate public-media boundary and extension work.

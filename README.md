@@ -47,6 +47,8 @@ Docker copy-on-create disk use prevents a full development container.
   Account overview and a Settings hub with browser-persisted appearance controls.
 - Reusable accessible side drawer, used by responsive app navigation, with native
   modal focus/scroll handling and start/end placement.
+- Local debug component showcase at `/dev/components`, plus automated desktop/
+  mobile mock-OAuth browser smoke coverage in CI.
 - Owner-scoped private Notes CRUD as a small feature example.
 - Plain PostgreSQL 17, declarative `pgschema` setup, per-test disposable databases,
   and separate production migration/runtime roles.
@@ -75,6 +77,7 @@ login deployment are excluded.
 | New app setup | [docs/new-app-setup.md](docs/new-app-setup.md) |
 | Agent-guided setup | [docs/agent-setup.md](docs/agent-setup.md) |
 | Starter pages and search behavior | [docs/pages.md](docs/pages.md) |
+| Component showcase and browser CI | [docs/components.md](docs/components.md) |
 | Architecture and extension points | [docs/architecture.md](docs/architecture.md) |
 | Production deployment | [docs/deployment.md](docs/deployment.md) |
 | Security properties | [docs/security.md](docs/security.md) |
