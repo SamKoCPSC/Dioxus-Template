@@ -17,7 +17,7 @@ pub fn AppLayout() -> Element {
      a { href:"#main",class:"skip-link","Skip to content" }
      navigation::AppNavigation {}
      main {id:"main",class:"container main-content",crate::auth::refresh::AuthRefresh{},crate::auth::session_page::SessionPage{} }
-     footer {class:"container footer",aria_label:"Footer navigation", span { "{app::NAME}" } Link { to: crate::Route::About {}, "About" } }
+     footer {class:"container footer",aria_label:"Footer navigation", span { "{app::NAME}" } Link { to: crate::Route::About {}, "About" } crate::pages::showcase::ShowcaseLink {} }
     }
 }
 

@@ -64,6 +64,21 @@
 .drawer-links .is-active{color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);font-weight:650}
 .drawer-actions{display:flex;flex-direction:column;gap:.75rem;margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border)}
 .drawer-actions .btn,.drawer-actions form{width:100%}
+/* Local component showcase and shared loading indicator. */
+:root{--space-2xl:3rem}
+.spinner{width:1.5rem;height:1.5rem;flex-shrink:0;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spinner-turn .8s linear infinite}
+@keyframes spinner-turn{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.spinner{animation:none}}
+.showcase-intro{max-width:48rem}
+.showcase-index{display:flex;flex-wrap:wrap;gap:.6rem 1.25rem;padding-block:1rem;border-block:1px solid var(--border);margin-top:2rem}
+.showcase-swatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(150px,100%),1fr));gap:1rem}
+.showcase-swatch{display:flex;flex-direction:column;gap:.4rem;min-width:0}
+.swatch-color{height:3rem;border:1px solid var(--border);border-radius:.5rem}
+.showcase-swatch code{color:var(--text-secondary);overflow-wrap:anywhere}
+.showcase-columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:1.25rem}
+.showcase-columns>*{min-width:0;overflow-wrap:anywhere}
+.showcase-loading{display:flex;align-items:center;gap:.75rem;margin-block:1rem}
+.feedback-host{max-width:calc(100% - 2rem)}
 @media(max-width:850px){
  .nav .nav-links,.nav .header-theme{display:none}
  .nav{flex-wrap:nowrap;gap:.6rem}

@@ -17,8 +17,8 @@ mod types;
 mod utils;
 use components::AppLayout;
 use pages::{
-    About, Account, Accounts, Dashboard, EditNote, Home, Landing, Login, NewNote, NotFound, Notes,
-    Profile, Search, Settings,
+    About, Account, Accounts, ComponentShowcase, Dashboard, EditNote, Home, Landing, Login,
+    NewNote, NotFound, Notes, Profile, Search, Settings,
 };
 #[derive(Debug, Clone, Routable, PartialEq)]
 pub enum Route {
@@ -33,6 +33,8 @@ pub enum Route {
     Search {},
     #[route("/about")]
     About {},
+    #[route("/dev/components")]
+    ComponentShowcase {},
     #[route("/account")]
     Account {},
     #[route("/settings")]
@@ -148,6 +150,10 @@ async fn build_application_router() -> axum::Router {
         .layer(axum::middleware::from_fn_with_state(
             config.clone(),
             middleware::local_origin::canonicalize_local_origin,
+        ))
+        .layer(axum::middleware::from_fn_with_state(
+            config.local_loopback_origin().is_some(),
+            middleware::development::guard_showcase,
         ))
         .layer(axum::middleware::from_fn_with_state(
             config.security_headers(),

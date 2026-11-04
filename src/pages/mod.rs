@@ -2,9 +2,11 @@ use crate::{auth::context::use_auth, Route};
 use dioxus::prelude::*;
 mod notes;
 mod settings;
+pub(crate) mod showcase;
 mod workspace;
 pub use notes::{EditNote, NewNote, Notes};
 pub use settings::{Account, Accounts, Profile, Settings};
+pub use showcase::ComponentShowcase;
 pub use workspace::{Dashboard, Home, Search};
 #[component]
 pub fn Landing() -> Element {

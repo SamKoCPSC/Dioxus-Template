@@ -34,7 +34,7 @@ The setup guide explains which account-console steps only the user can complete.
 
 ## Architecture and changes
 
-Read `docs/architecture.md`, `docs/pages.md` and `docs/security.md`. `src/auth` and middleware are
+Read `docs/architecture.md`, `docs/pages.md`, `docs/components.md` and `docs/security.md`. `src/auth` and middleware are
 reusable foundations; `src/pages/notes.rs`, `src/api/notes.rs` and the `notes`
 table are the replaceable example. `src/api/workspace.rs` also supplies the
 Notes-based Dashboard/Search read models. Keep infrastructure and feature policy apart.
@@ -59,6 +59,9 @@ PostgreSQL binaries on PATH. Use focused tests while iterating, then the complet
 required checks once the change is ready. For UI/setup changes, run the browser
 smoke test against the actual local instance and inspect desktop/mobile captures.
 The smoke test deletes only its uniquely labeled example note.
+The CI browser job uses the same disposable host-mode workflow and also exercises
+the local component showcase. Keep artifacts limited to synthetic screenshots
+and result.json; never upload private runtime logs, state, traces or credentials.
 
 Report which checks actually ran, any remaining user account-console steps, and
 any limitations. Distinguish local mock OAuth from live provider validation and
